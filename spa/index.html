@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample SPA</title>
+  <style>
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    * {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .header {
+      align-items: center;
+      background-color: slategrey;
+      box-shadow: 0 .5rem 1rem #ccc;
+      box-sizing: border-box;
+      color: #fff;
+      display: flex;
+      height: 4rem;
+      justify-content: space-between;
+      padding: 2rem;
+      width: 100%;
+    }
+
+    .header__title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .btn {
+      appearance: none;
+      background-color: #eee;
+      border-radius: 1rem;
+      border: none;
+      cursor: pointer;
+      height: 2rem;
+      outline: none;
+      padding: .5rem 1rem;
+      transition: all .3s;
+    }
+
+    .btn:hover {
+      background-color: #ccc;
+    }
+
+    .information {
+      border-radius: 1rem;
+      margin: 2rem auto;
+      padding: 1rem;
+      width: 80%;
+    }
+
+    .information.success {
+      background-color: lemonchiffon;
+    }
+
+    .information.failure {
+      background-color: lightpink;
+    }
+
+    .information.success::before {
+      content: "🎉 ";
+    }
+
+    .information.failure::before {
+      content: "😱 ";
+    }
+
+    .sectionTitle {
+      font-size: 2rem;
+      margin: 2rem auto;
+      width: 80%;
+    }
+
+    .items {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 2rem auto;
+      width: 80%;
+    }
+
+    .item {
+      background-color: #eee;
+      border-radius: 1rem;
+      box-shadow: 0 .5rem 1rem #ccc;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      transition: all .3s;
+      width: 8rem;
+    }
+
+    .item:hover {
+      box-shadow: 0 .2rem .5rem #ccc;
+      cursor: pointer;
+    }
+
+    .item__iconWrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .item__icon {
+      align-items: center;
+      background-color: #fff;
+      border-radius: 2rem;
+      display: flex;
+      font-size: 2.4rem;
+      justify-content: center;
+      height: 4rem;
+      width: 4rem;
+    }
+
+    .item__info {
+      align-items: flex-end;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .item__name,
+    .item__price {
+      font-weight: bold;
+    }
+
+    .item__price {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="header__title">My Great Shop</h1>
+    <a id="loginBtn" href="/api/login"><button class="btn">LOG IN</button></a>
+    <a id="logoutBtn" href="/api/logout" style="display: none;"><button class="btn">LOG OUT</button></a>
+  </header>
+  <div id="information" class="information"></div>
+  <h2 class="sectionTitle">Items</h2>
+  <div id="items" class="items"></div>
+  <template id="itemTmpl">
+    <div class="item">
+      <div class="item__iconWrapper">
+        <div class="item__icon"></div>
+      </div>
+      <div class="item__info">
+        <div class="item__name"></div>
+        <div class="item__price"></div>
+      </div>
+    </div>
+  </template>
+  <script>
+    const getItems = () => {
+      fetch("/api/items").then(res => res.json()).then(json => {
+        const template = document.getElementById("itemTmpl");
+        const holder = document.getElementById("items");
+        holder.innerHTML = "";
+        for (let i = 0; i < json.items.length; i++) {
+          const item = json.items[i];
+          const clone = template.content.cloneNode(true);
+          clone.querySelector(".item__icon").textContent = item.icon;
+          clone.querySelector(".item__name").textContent = item.name;
+          clone.querySelector(".item__price").textContent = `$${item.price}`;
+          holder.appendChild(clone);
+        }
+      });
+    };
+    const getUserInfo = () => {
+      fetch("/api/userinfo").then(res => {
+        if (res.status === 401) {
+          const information = document.getElementById("information");
+          information.classList.remove("success");
+          information.classList.add("failure");
+          information.textContent = "Could not obtain userinfo. Did you logged in?";
+          throw new Error("401");
+        }
+        return res.json();
+      }).then(json => {
+        const information = document.getElementById("information");
+        information.classList.add("success");
+        information.classList.remove("failure");
+        information.textContent = `You are logged in as ${json.userinfo.name} (ID: ${json.userinfo.id})`;
+        const loginBtn = document.getElementById("loginBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+      });
+    };
+    getItems();
+    getUserInfo();
+  </script>
+</body>
+
+</html>

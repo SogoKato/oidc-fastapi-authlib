@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "oidc-fastapi-authlib"
+version = "0.1.0"
+description = ""
+authors = ["Sogo Kato"]
+license = "MIT"
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Authlib = "^1.1.0"
+fastapi = "^0.88.0"
+httpx = "^0.23.1"
+itsdangerous = "^2.1.2"
+python-dotenv = "^0.21.0"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"

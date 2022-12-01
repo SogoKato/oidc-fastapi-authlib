@@ -1,0 +1,23 @@
+version: '3'
+services:
+  app:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: backend
+        target: /app
+  nginx:
+    image: nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: nginx
+        target: /etc/nginx/conf.d
+      - type: bind
+        source: spa
+        target: /usr/share/nginx/html
